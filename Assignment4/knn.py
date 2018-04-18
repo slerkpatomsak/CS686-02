@@ -15,12 +15,13 @@ class KNN(classifier):
         import numpy as np
         from collections import Counter
        
-        distances = []
         predict = []
-        for x in range(len(X)):
-            for i in range(len(self.X_train)):
-                distance = np.linalg.norm(np.array(X.iloc[x])-np.array(self.X_train.iloc[i]))
-                distances.append([distance,i])
-            voters = [i[1] for i in sorted(distances)[:k]]
-            predict.append(Counter(voters).most_common(1)[0][0])
+        for i in range(len(X)):
+            distances = []
+            for j in range(len(self.X_train)):
+                distance = np.linalg.norm(np.array(X.iloc[i])-np.array(self.X_train.iloc[j]))
+                distances.append([distance,self.y_train.iloc[j]])
+                
+            voters = [d[1] for d in sorted(distances)[:k]]
+            predict.append(Counter(voters).most_common(1)[0][0])    
         return predict
