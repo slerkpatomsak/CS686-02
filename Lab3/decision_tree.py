@@ -2,10 +2,8 @@ from classifier import classifier
 
 class decision_tree(classifier):
 
-    def __init__(self,criterion):
+    def __init__(self,criterion='entropy'):
         self.criterion = criterion
-        pass
-
 
     def gini(self, Y):
         size = len(Y)
@@ -127,16 +125,16 @@ class decision_tree(classifier):
         return self.root
     
     def predict_sample(self,node,sample):
-        
         if(isinstance(node,int)):
             return node
-        
-        feature_index = list(node.keys())[0]
-        keys = list(node[feature_index].keys())
-        for key in keys:
-            if(sample[feature_index] == key):
-                dictionary = node.get(feature_index).get(key)
-                return self.predict_sample(dictionary,sample)
+     
+        feature_indexes = list(node.keys())
+        for feature_index in feature_indexes:
+            keys = list(node[feature_index].keys())
+            for key in keys:
+                if(sample[feature_index] == key):
+                    dictionary = node.get(feature_index).get(key)
+                    return self.predict_sample(dictionary,sample)
 
     def predict(self, X):
         hypothesises = []
