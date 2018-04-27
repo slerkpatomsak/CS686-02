@@ -2,7 +2,8 @@ from classifier import classifier
 
 class decision_tree(classifier):
 
-    def __init__(self):
+    def __init__(self,criterion):
+        self.criterion = criterion
         pass
 
 
@@ -50,18 +51,26 @@ class decision_tree(classifier):
 
 
     def choose_feature(self, X, Y):
-        entropy = self.entropy(Y)
+        if(self.criterion == 'entropy'):
+            score = self.entropy(Y)
+        else :
+            score = self.gini(Y)
+            
         best_information_gain = 0.
         best_feature = -1
         for i in range(len(X[0])):  # For each feature
             feature_list = [x[i] for x in X]
             values = set(feature_list)
-            entropy_i = 0.
+            score_i = 0.
             for value in values:
                 sub_x, sub_y = self.split_data(X, Y, i, value)
                 prob = len(sub_x) / float(len(X))
-                entropy_i += prob * self.entropy(sub_y)
-            info_gain = entropy - entropy_i
+                if(self.criterion == 'entropy'):
+                    score_i += prob * self.entropy(sub_y)
+                else:
+                    score_i += prob * self.gini(sub_y)
+                    
+            info_gain = score - score_i
             if info_gain > best_information_gain:
                 best_information_gain = info_gain
                 best_feature = i
@@ -81,24 +90,22 @@ class decision_tree(classifier):
         from operator import itemgetter
         # Use this function if a leaf cannot be split further and
         # ... the node is not pure
-
         classcount = self.class_dict(Y)
-        sorted_classcount = sorted(classcount.iteritems(), key=itemgetter(1), reverse=True)
+        sorted_classcount = sorted(classcount.items(), key=itemgetter(1), reverse=True)
         return sorted_classcount[0][0]
 
 
     def build_tree(self, X, Y):
-        print(X)
         # IF there's only one instance or one class, don't continue to split
         if len(Y) <= 1 or len(self.class_dict(Y)) == 1:
-            return
+            return self.majority(Y)
 
         if len(X[0]) == 1:
             return self.majority(Y)   # TODO: Fix this
 
         best_feature = self.choose_feature(X, Y)
         if best_feature < 0 or best_feature >= len(X[0]):
-            return
+            return self.majority(Y)
 
         this_tree = dict()
         feature_values = [example[best_feature] for example in X]
@@ -111,13 +118,29 @@ class decision_tree(classifier):
             if value not in this_tree[best_feature]:
                 this_tree[best_feature][value] = 0
             this_tree[best_feature][value] = self.build_tree(subtree_x, subtree_y)
-        return this_tree
 
+        return this_tree
+        
 
     def fit(self, X, Y):
-        fitted_tree = self.build_tree(X, Y)
-        return fitted_tree
-
+        self.root = self.build_tree(X, Y)
+        return self.root
+    
+    def predict_sample(self,node,sample):
+        
+        if(isinstance(node,int)):
+            return node
+        
+        feature_index = list(node.keys())[0]
+        keys = list(node[feature_index].keys())
+        for key in keys:
+            if(sample[feature_index] == key):
+                dictionary = node.get(feature_index).get(key)
+                return self.predict_sample(dictionary,sample)
 
     def predict(self, X):
-        pass
+        hypothesises = []
+        for i in X:
+            predicted = self.predict_sample(self.root,i)
+            hypothesises.append(predicted)
+        return hypothesises
