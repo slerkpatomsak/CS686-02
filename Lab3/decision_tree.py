@@ -116,7 +116,7 @@ class decision_tree(classifier):
             if value not in this_tree[best_feature]:
                 this_tree[best_feature][value] = 0
             this_tree[best_feature][value] = self.build_tree(subtree_x, subtree_y)
-
+        
         return this_tree
         
 
@@ -136,9 +136,9 @@ class decision_tree(classifier):
                     dictionary = node.get(feature_index).get(key)
                     return self.predict_sample(dictionary,sample)
 
-    def predict(self, X):
+    def predict(self,X):
         hypothesises = []
         for i in X:
             predicted = self.predict_sample(self.root,i)
             hypothesises.append(predicted)
-        return hypothesises
+        return score

@@ -136,9 +136,17 @@ class decision_tree(classifier):
                     dictionary = node.get(feature_index).get(key)
                     return self.predict_sample(dictionary,sample)
 
-    def predict(self, X):
+    def predict(self,X):
         hypothesises = []
         for i in X:
             predicted = self.predict_sample(self.root,i)
             hypothesises.append(predicted)
+            
         return hypothesises
+   
+    # Calculate accuracy percentage 
+    def accuracy_metric(self,actual, predicted):
+        correct = 0
+        for i in xrange(len(actual)):
+            if actual[i] == predicted[i]: correct += 1
+        return correct / float( len(actual) )
