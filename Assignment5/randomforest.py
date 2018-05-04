@@ -47,7 +47,7 @@ class random_forest(classifier):
         import numpy as np
         sample = list()
         n_sample = round(len(dataset) * ratio)
-        chosen_idx=np.random.choice(len(dataset), replace=False, size=n_sample)
+        chosen_idx=np.random.choice(len(dataset), replace=True, size=n_sample)
         dataset_trimmed =dataset.iloc[chosen_idx]
         sample_X = dataset_trimmed.iloc[:,:-1]
         sample_Y = dataset_trimmed.iloc[:,-1]
